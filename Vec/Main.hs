@@ -161,4 +161,5 @@ withEvenLength xs = putStrLn $ "Called with even length vector: " <> show xs
 mapInts :: Vec n Integer -> Vec n String
 mapInts = map (show . (+ 1))
 
+natsIso :: Nat
 natsIso = toNat (toSNat @'Zero)
