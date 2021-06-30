@@ -22,7 +22,6 @@ module Handshake.Main where
 --
 -- Overly annotated for clarity.
 
-import Data.Type.Equality (type (==))
 import GHC.Types (Type)
 
 -- OCaml style, off we go :).
@@ -83,13 +82,13 @@ close _ = HClose
 
 connect :: forall s. (SStateI s, IsOpen s ~ 'True) => (Handshake s -> Handshake 'Connected)
 connect = case sstate @s of
-  SNegotiating -> accept . auth
+  SNegotiating -> connect . auth
   SAuthenticating -> accept
   SConnected -> id
 
-class Closeable (s :: State)
+class (IsOpen s ~ 'True) => Closeable (s :: State)
 
-instance (s == 'Closed) ~ 'False => Closeable s
+instance IsOpen s ~ 'True => Closeable s
 
 type family IsOpen (s :: State) :: Bool where
   IsOpen 'Closed = 'False
