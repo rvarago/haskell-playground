@@ -1,3 +1,3 @@
 # haskell-playground
 
-> My playground for throw-away Haskell programs
+> My playground for throw-away, not necessarily useful, Haskell programs
