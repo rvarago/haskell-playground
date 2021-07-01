@@ -95,18 +95,18 @@ type family IsOpen (s :: State) :: Bool where
   IsOpen _ = 'True
 
 data SomeHandshake where
-  MkSomeConnection :: Handshake s -> SomeHandshake
+  MkSomeHandshake :: Handshake s -> SomeHandshake
 
 deriving stock instance Show SomeHandshake
 
 fromState :: Address -> SState s -> SomeHandshake
-fromState _ SClosed = MkSomeConnection HClose
-fromState addr SNegotiating = MkSomeConnection $ HOpen addr SClosed
-fromState addr SAuthenticating = MkSomeConnection $ HAuthenticate addr SNegotiating
-fromState addr SConnected = MkSomeConnection $ HAccept addr SAuthenticating
+fromState _ SClosed = MkSomeHandshake HClose
+fromState addr SNegotiating = MkSomeHandshake $ HOpen addr SClosed
+fromState addr SAuthenticating = MkSomeHandshake $ HAuthenticate addr SNegotiating
+fromState addr SConnected = MkSomeHandshake $ HAccept addr SAuthenticating
 
 program1 :: Handshake 'Connected
 program1 = "localhost:8080" |> open |> connect
 
 program2 :: SomeHandshake
-program2 = MkSomeConnection (HAccept "localhost:8080" SAuthenticating)
+program2 = MkSomeHandshake (HAccept "localhost:8080" SAuthenticating)
