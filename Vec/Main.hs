@@ -153,6 +153,9 @@ fromList :: [a] -> SomeVec KnowNothing a
 fromList [] = MkSomeVec VNil
 fromList (x : xs) = case fromList xs of MkSomeVec xs -> MkSomeVec $ x :> xs
 
+toList :: Vec n a -> [a]
+toList = foldr (:) []
+
 -- Examples.
 
 withEvenLength :: (IsEven n, Show a) => Vec n a -> IO ()
@@ -163,3 +166,7 @@ mapInts = map (show . (+ 1))
 
 natsIso :: Nat
 natsIso = toNat (toSNat @'Zero)
+
+mkVecLen2 :: [a] -> Maybe (Vec ('Succ ('Succ 'Zero)) a)
+mkVecLen2 (a : b : _) = Just $ a :> b :> VNil
+mkVecLen2 _ = Nothing
