@@ -47,11 +47,11 @@ mkSomeInstance = \case
   SelectX -> MkSome InstanceX
   SelectY -> MkSome InstanceY
 
-runSomething :: InterfaceSelector -> IO ()
-runSomething = run . mkSomeInstance
+program :: InterfaceSelector -> IO ()
+program = run . mkSomeInstance
   where
     run :: Some Interface -> IO ()
     run si = withSome si $ putStrLn . act
 
-program :: IO ()
-program = runSomething SelectX >> runSomething SelectY
+main :: IO ()
+main = program SelectX >> program SelectY
