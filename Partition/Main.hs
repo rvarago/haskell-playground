@@ -19,12 +19,15 @@ partitionP p (a : as)
 -- >>> partitionP' even [1..10]
 -- Partitioned {matches = [2,4,6,8,10], mismatches = [1,3,5,7,9]}
 partitionP' :: (a -> Bool) -> [a] -> Partitioned a
-partitionP' _ [] = Partitioned [] []
-partitionP' p (a : as)
-  | p a = addMatch a rest
-  | otherwise = addMismatch a rest
+partitionP' p = partitioned . go p
   where
-    rest = partitionP' p as
+    partitioned (matches, mismatches) = Partitioned matches mismatches
+    go _ [] = ([], [])
+    go p (a : as)
+      | p a = first (a :) rest
+      | otherwise = second (a :) rest
+      where
+        rest = go p as
 
 data Partitioned a = Partitioned
   { matches :: [a],
