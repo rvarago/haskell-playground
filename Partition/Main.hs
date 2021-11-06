@@ -35,12 +35,6 @@ data Partitioned a = Partitioned
   }
   deriving (Show)
 
-addMatch :: a -> Partitioned a -> Partitioned a
-addMatch match (Partitioned matches mismatches) = Partitioned (match : matches) mismatches
-
-addMismatch :: a -> Partitioned a -> Partitioned a
-addMismatch mismatch (Partitioned matches mismatches) = Partitioned matches (mismatch : mismatches)
-
 -- Selector.
 
 -- >>> partitionE (\x -> if even x then Left x else Right x) [1..10]
