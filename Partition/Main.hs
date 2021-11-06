@@ -1,5 +1,7 @@
 module Partition.Main where
 
+-- Partitioning a list with a predicate, predicate + record, and either.
+
 import Data.Bifunctor (first, second)
 
 -- Predicate.
