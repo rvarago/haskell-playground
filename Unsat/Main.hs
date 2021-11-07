@@ -34,14 +34,14 @@ variables = go S.empty
       TAnd l r -> go ctx l <> go ctx r
       TOr l r -> go ctx l <> go ctx r
 
+type Valuation = M.Map Identifier Bool
+
 -- >>> valuations $ S.fromAscList ["x", "y", "z"]
 -- [fromList [("x",False),("y",False),("z",False)],fromList [("x",False),("y",False),("z",True)],fromList [("x",False),("y",True),("z",False)],fromList [("x",False),("y",True),("z",True)],fromList [("x",True),("y",False),("z",False)],fromList [("x",True),("y",False),("z",True)],fromList [("x",True),("y",True),("z",False)],fromList [("x",True),("y",True),("z",True)]]
 valuations :: Vars -> [Valuation]
 valuations = map M.fromAscList . mapM values . S.toAscList
   where
     values i = [(i, False), (i, True)]
-
-type Valuation = M.Map Identifier Bool
 
 -- >>> eval (M.fromAscList [("x", False)]) $ TNot (TVar "x")
 -- True
