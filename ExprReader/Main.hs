@@ -10,16 +10,17 @@ import Control.Monad.Reader
 import qualified Data.Map as M
 
 -- >>> run
--- Just (VLit 3)
+-- Just (VBool False)
 run =
-  let expr = cond (var "x") (lit 1 `add` var "y") (bool False)
-      env = M.fromAscList [("x", VBool True), ("y", VLit 2)]
+  let expr = letin "y" (lit 1 `add` lit 2) (cond (var "x") (lit 100 `add` var "y") (bool False))
+      env = M.fromAscList [("x", VBool True)]
    in runReader (eval expr) env
 
 data Expr
   = ELit Int
   | EBool Bool
   | EVar Ident
+  | ELetIn Ident Expr Expr
   | EAdd Expr Expr
   | ECond Expr Expr Expr
   deriving (Show)
@@ -31,6 +32,8 @@ bool = EBool
 var = EVar
 
 add = EAdd
+
+letin = ELetIn
 
 cond = ECond
 
@@ -49,6 +52,10 @@ eval :: Expr -> Eval
 eval (ELit i) = wrapLit i
 eval (EBool b) = wrapBool b
 eval (EVar n) = asks $ M.lookup n
+eval (ELetIn n h b) =
+  eval h >>= \case
+    Just h -> local (M.insert n h) $ eval b
+    Nothing -> pure Nothing
 eval (EAdd l r) = join $ liftA2 evalAdd (eval l) (eval r)
 eval (ECond c t e) =
   eval c >>= \case
