@@ -14,7 +14,7 @@ import qualified Data.Map as M
 run =
   let expr = letin "y" (lit 1 `add` lit 2) (cond (var "x") (lit 100 `add` var "y") (bool False))
       env = M.fromAscList [("x", VBool True)]
-   in runReader (eval expr) env
+   in eval env expr
 
 data Expr
   = ELit Int
@@ -48,19 +48,21 @@ data Value
 
 type Eval = Reader Env (Maybe Value)
 
-eval :: Expr -> Eval
-eval (ELit i) = wrapLit i
-eval (EBool b) = wrapBool b
-eval (EVar n) = asks $ M.lookup n
-eval (ELetIn n h b) =
-  eval h >>= \case
-    Just h -> local (M.insert n h) $ eval b
+eval env = flip runReader env . eval'
+
+eval' :: Expr -> Eval
+eval' (ELit i) = wrapLit i
+eval' (EBool b) = wrapBool b
+eval' (EVar n) = asks $ M.lookup n
+eval' (ELetIn n h b) =
+  eval' h >>= \case
+    Just h -> local (M.insert n h) $ eval' b
     Nothing -> evalFail
-eval (EAdd l r) = join $ liftA2 evalAdd (eval l) (eval r)
-eval (ECond c t e) =
-  eval c >>= \case
-    Just (VBool True) -> eval t
-    Just (VBool False) -> eval e
+eval' (EAdd l r) = join $ liftA2 evalAdd (eval' l) (eval' r)
+eval' (ECond c t e) =
+  eval' c >>= \case
+    Just (VBool True) -> eval' t
+    Just (VBool False) -> eval' e
     _ -> evalFail
 
 wrapLit = pure . Just . VLit
