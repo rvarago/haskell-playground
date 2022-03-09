@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module ExprReader.Main where
@@ -49,9 +50,8 @@ eval (ELit i) = wrapLit i
 eval (EBool b) = wrapBool b
 eval (EVar n) = asks $ M.lookup n
 eval (EAdd l r) = join $ liftA2 evalAdd (eval l) (eval r)
-eval (ECond c t e) = do
-  c <- eval c
-  case c of
+eval (ECond c t e) =
+  eval c >>= \case
     Just (VBool True) -> eval t
     Just (VBool False) -> eval e
     _ -> pure Nothing
