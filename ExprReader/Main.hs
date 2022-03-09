@@ -55,17 +55,19 @@ eval (EVar n) = asks $ M.lookup n
 eval (ELetIn n h b) =
   eval h >>= \case
     Just h -> local (M.insert n h) $ eval b
-    Nothing -> pure Nothing
+    Nothing -> evalFail
 eval (EAdd l r) = join $ liftA2 evalAdd (eval l) (eval r)
 eval (ECond c t e) =
   eval c >>= \case
     Just (VBool True) -> eval t
     Just (VBool False) -> eval e
-    _ -> pure Nothing
+    _ -> evalFail
 
 wrapLit = pure . Just . VLit
 
 wrapBool = pure . Just . VBool
 
 evalAdd (Just (VLit l)) (Just (VLit r)) = wrapLit (l + r)
-evalAdd _ _ = pure Nothing
+evalAdd _ _ = evalFail
+
+evalFail = pure Nothing
