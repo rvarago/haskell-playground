@@ -11,6 +11,6 @@ let
       mtl
       # polysemy # TODO: Fix build error due to doctest.
       servant
-      transformers
+      #transformers
     ]);
 in mkShell { buildInputs = [ ghc hlint ormolu ]; }
